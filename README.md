@@ -23,9 +23,10 @@ Build the application using Cargo:
 
 ```sh
 cargo build --release
-Running the Application
-Run MediaMender from the command line:
 ```
+
+### Running the Application
+Run MediaMender from the command line:
 
 ```sh
 cargo run
