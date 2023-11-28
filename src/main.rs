@@ -40,7 +40,9 @@ fn display_files_in_batches(files: &[PathBuf]) {
             println!("{:?}", file)
         }
         println!("Press Enter to see more...");
-        io::stdin().read_line(&mut String::new()).expect("Failed to read line.");
+        io::stdin()
+            .read_line(&mut String::new())
+            .expect("Failed to read line.");
     }
 }
 
@@ -62,8 +64,15 @@ fn build_file_extension_map(path: &str) -> HashMap<String, Vec<PathBuf>> {
         let entry = entry.unwrap();
         let path = entry.path();
         if path.is_file() {
-            let extensions = path.extension().unwrap_or_default().to_string_lossy().to_string();
-            file_extensions.entry(extensions).or_default().push(path.to_path_buf())
+            let extensions = path
+                .extension()
+                .unwrap_or_default()
+                .to_string_lossy()
+                .to_string();
+            file_extensions
+                .entry(extensions)
+                .or_default()
+                .push(path.to_path_buf())
         }
     }
 
