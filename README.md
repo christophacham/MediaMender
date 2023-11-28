@@ -14,7 +14,7 @@ Rust: Ensure you have Rust installed on your system.
 Clone the repository:
 
 ```sh
-git clone https://github.com/[your-username]/MediaMender.git
+git clone https://github.com/christophacham/MediaMender.git
 cd MediaMender
 ```
 
