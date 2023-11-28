@@ -14,7 +14,6 @@ Rust: Ensure you have Rust installed on your system.
 Clone the repository:
 
 ```sh
-Copy code
 git clone https://github.com/[your-username]/MediaMender.git
 cd MediaMender
 ```
@@ -23,14 +22,12 @@ cd MediaMender
 Build the application using Cargo:
 
 ```sh
-Copy code
 cargo build --release
 Running the Application
 Run MediaMender from the command line:
 ```
 
 ```sh
-Copy code
 cargo run
 ```
 
