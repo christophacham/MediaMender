@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use std::io;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use trash;
 use walkdir::WalkDir;
@@ -8,14 +8,23 @@ use walkdir::WalkDir;
 const BATCH_SIZE: usize = 20;
 
 fn main() {
-    let path = prompt_for_path();
-    let file_extensions = build_file_extension_map(&path);
+    match prompt_for_path() {
+        Some(path) => {
+            let mut file_extensions = build_file_extension_map(&path);
+            main_menu_loop(&mut file_extensions, &path);
+        }
+        None => println!("Invalid path or access denied."),
+    }
+}
 
+fn main_menu_loop(file_extensions: &mut HashMap<String, Vec<PathBuf>>, path: &str) {
     loop {
         match show_main_menu() {
-            MainMenuOption::ViewCounts => display_extension_counts(&file_extensions),
-            MainMenuOption::BrowseFiles => browse_files_by_extension(&file_extensions),
-            MainMenuOption::DeleteFiles => delete_files_by_extension(&file_extensions),
+            MainMenuOption::ViewCounts => display_extension_counts(file_extensions),
+            MainMenuOption::BrowseFiles => browse_files_by_extension(file_extensions),
+            MainMenuOption::DeleteFiles => delete_files_by_extension(file_extensions),
+            MainMenuOption::ShowExtensions => show_file_extensions(file_extensions),
+            MainMenuOption::Refresh => *file_extensions = build_file_extension_map(path),
             MainMenuOption::Exit => break,
         }
     }
@@ -25,15 +34,20 @@ enum MainMenuOption {
     ViewCounts,
     BrowseFiles,
     DeleteFiles,
+    ShowExtensions,
+    Refresh,
     Exit,
 }
 
 fn show_main_menu() -> MainMenuOption {
     loop {
+        println!("\nMain Menu:");
         println!("1. View file counts by extension");
         println!("2. Browse files by extension");
         println!("3. Delete files by extension");
-        println!("4. Exit");
+        println!("4. Show file extensions");
+        println!("5. Refresh file extension list");
+        println!("6. Exit");
 
         let mut choice = String::new();
         io::stdin()
@@ -43,9 +57,18 @@ fn show_main_menu() -> MainMenuOption {
             "1" => return MainMenuOption::ViewCounts,
             "2" => return MainMenuOption::BrowseFiles,
             "3" => return MainMenuOption::DeleteFiles,
-            "4" => return MainMenuOption::Exit,
+            "4" => return MainMenuOption::ShowExtensions,
+            "5" => return MainMenuOption::Refresh,
+            "6" => return MainMenuOption::Exit,
             _ => println!("Invalid option, please try again."),
         }
+    }
+}
+
+fn show_file_extensions(file_extensions: &HashMap<String, Vec<PathBuf>>) {
+    println!("\nAvailable file extensions:");
+    for extension in file_extensions.keys() {
+        println!(".{}", extension);
     }
 }
 
@@ -123,36 +146,35 @@ fn prompt_for_extension() -> String {
 fn build_file_extension_map(path: &str) -> HashMap<String, Vec<PathBuf>> {
     let mut file_extensions = HashMap::<String, Vec<PathBuf>>::new();
 
-    for entry in WalkDir::new(path) {
-        let entry = entry.unwrap();
+    for entry in WalkDir::new(path).into_iter().filter_map(Result::ok) {
         let path = entry.path();
         if path.is_file() {
-            let extensions = path
+            let extension = path
                 .extension()
                 .unwrap_or_default()
                 .to_string_lossy()
                 .to_string();
             file_extensions
-                .entry(extensions)
+                .entry(extension)
                 .or_default()
-                .push(path.to_path_buf())
+                .push(path.to_path_buf());
         }
-    }
-
-    for files in file_extensions.values_mut() {
-        files.sort();
     }
 
     file_extensions
 }
 
-fn prompt_for_path() -> String {
+fn prompt_for_path() -> Option<String> {
     println!("Enter the path to scan:");
     let mut path = String::new();
-
     io::stdin()
         .read_line(&mut path)
         .expect("Failed to read line.");
 
-    path.trim().to_string()
+    let path = path.trim();
+    if Path::new(path).exists() {
+        Some(path.to_string())
+    } else {
+        None
+    }
 }
