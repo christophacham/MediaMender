@@ -1,6 +1,6 @@
 # MediaMender
-MediaMender is a Rust-based command-line tool designed to help organize and tidy up media libraries. It allows users to browse files in their directories, sorted and grouped by file extension, and assists in cleaning up unnecessary files such as text documents within media folders.
-<img src="doc/icon.png" width="200" />
+MediaMender is a Rust-based command-line tool designed to help organize and tidy up media libraries. It allows users to browse files in their directories, sorted and grouped by file extension, and assists in cleaning up unnecessary files such as text documents within media folders.   
+<img src="doc/icon.png" width="200" />   
 ## Features
 Browse files in any directory and its subdirectories.
 - Group and list files by their extensions.
